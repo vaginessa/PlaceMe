@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">PlaceMe</string>
+    <string name="reload">Reload</string>
+    <string name="title">TITLE</string>
+    <string name="about">About</string>
+    <string name="abt_content">
+        "Developed by chatRG\n\n
+        Due to HTML encoding, some text might appear gibberish.
+        It\'s up to you to make sense outta it."
+    </string>
+</resources>
