@@ -3,12 +3,12 @@ package com.placeme;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.util.List;
@@ -23,9 +23,24 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar_main);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle(R.string.app_name);
+        setTitle(R.string.app_name);
+
+        final SwipeRefreshLayout mSwipe = (SwipeRefreshLayout) findViewById(R.id.swipe);
+        mSwipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                new GetData().execute(urlLoc);
+                mSwipe.setRefreshing(false);
+            }
+        });
+        mSwipe.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+
         new GetData().execute(urlLoc);
     }
 
@@ -38,13 +53,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.reload:
-                new GetData().execute(urlLoc);
-                break;
             case R.id.about:
-                new SweetAlertDialog(this)
-                        .setTitleText(getResources().getString(R.string.about))
+                new SweetAlertDialog(this, SweetAlertDialog.CUSTOM_IMAGE_TYPE)
+                        .setTitleText(getResources().getString(R.string.app_name))
                         .setContentText(getResources().getString(R.string.abt_content))
+                        .setCustomImage(R.mipmap.ic_launcher)
                         .show();
                 break;
         }
@@ -83,10 +96,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(List<Item> items) {
             ListView mListView = (ListView) findViewById(R.id.lview);
-            ArrayAdapter<Item> mAdapter = new ArrayAdapter<>(MainActivity.this,
-                    android.R.layout.simple_list_item_1, items);
-            mListView.setAdapter(mAdapter);
-            mListView.setOnItemClickListener(new ListListener(items, MainActivity.this));
+            mListView.setAdapter(new ListAdapter(MainActivity.this, items));
             sProgress.dismiss();
         }
     }
